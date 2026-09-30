@@ -22,77 +22,88 @@ function Login() {
     });
   };
 
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
 
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
+    try {
 
-    setLoading(true);
+      setLoading(true);
 
-    const response = await loginUser(
-      login.email,
-      login.password
-    );
+      const response = await loginUser(
+        login.email,
+        login.password
+      );
 
-    const user = response.data;
+      const user = response.data;
 
-    if (!user) {
+      if (!user) {
 
-      toast.error("Invalid Email or Password");
+        toast.error("Invalid Email or Password");
 
-      return;
-
-    }
-
-    localStorage.setItem(
-      "user",
-      JSON.stringify(user)
-    );
-
-    toast.success("Login Successful!");
-
-    setTimeout(() => {
-
-      if (user.role === "ADMIN") {
-
-        navigate("/admin");
-
-      } else {
-
-        navigate("/");
+        return;
 
       }
 
-    }, 1200);
-
-  } catch (error) {
-
-    console.log(error);
-
-    if (
-      error.response &&
-      error.response.data ===
-      "Your account has been deactivated. Please contact the administrator."
-    ) {
-
-      toast.error(
-        "Your account has been deactivated. Please contact the administrator."
+      localStorage.setItem(
+        "user",
+        JSON.stringify(user)
       );
 
-    } else {
+      toast.success("Login Successful!");
 
-      toast.error("Invalid Email or Password");
+      setTimeout(() => {
+
+        // ADMIN
+        if (user.role === "ADMIN") {
+
+          navigate("/admin");
+
+        }
+
+        // DELIVERY GUY
+        else if (user.role === "DELIVERY") {
+
+          navigate("/delivery");
+
+        }
+
+        // CUSTOMER
+        else {
+
+          navigate("/");
+
+        }
+
+      }, 1200);
+
+    } catch (error) {
+
+      console.log(error);
+
+      if (
+        error.response &&
+        error.response.data ===
+        "Your account has been deactivated. Please contact the administrator."
+      ) {
+
+        toast.error(
+          "Your account has been deactivated. Please contact the administrator."
+        );
+
+      } else {
+
+        toast.error("Invalid Email or Password");
+
+      }
+
+    } finally {
+
+      setLoading(false);
 
     }
 
-  } finally {
-
-    setLoading(false);
-
-  }
-
-};
+  };
 
   return (
 
@@ -116,6 +127,8 @@ const handleSubmit = async (e) => {
                 borderRadius: "20px",
               }}
             >
+
+              {/* LOGO */}
 
               <div className="text-center">
 
@@ -143,7 +156,12 @@ const handleSubmit = async (e) => {
 
               </div>
 
+
+              {/* LOGIN FORM */}
+
               <form onSubmit={handleSubmit}>
+
+                {/* EMAIL */}
 
                 <div className="mb-3">
 
@@ -163,6 +181,9 @@ const handleSubmit = async (e) => {
 
                 </div>
 
+
+                {/* PASSWORD */}
+
                 <div className="mb-4">
 
                   <label className="form-label">
@@ -181,6 +202,9 @@ const handleSubmit = async (e) => {
 
                 </div>
 
+
+                {/* LOGIN BUTTON */}
+
                 <button
                   type="submit"
                   className="btn w-100 py-2"
@@ -193,11 +217,16 @@ const handleSubmit = async (e) => {
                   }}
                 >
 
-                  {loading ? "Logging in..." : "Login"}
+                  {loading
+                    ? "Logging in..."
+                    : "Login"}
 
                 </button>
 
               </form>
+
+
+              {/* REGISTER */}
 
               <div className="text-center mt-4">
 
@@ -216,6 +245,9 @@ const handleSubmit = async (e) => {
                 </Link>
 
               </div>
+
+
+              {/* BACK HOME */}
 
               <div className="text-center mt-3">
 

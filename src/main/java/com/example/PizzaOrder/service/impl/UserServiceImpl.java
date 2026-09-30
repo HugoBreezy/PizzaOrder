@@ -22,7 +22,21 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Email already exists");
         }
 
+        // Normal registration is always CUSTOMER
         user.setRole("CUSTOMER");
+        user.setStatus("ACTIVE");
+
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User createDeliveryGuy(User user) {
+
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        user.setRole("DELIVERY");
         user.setStatus("ACTIVE");
 
         return userRepository.save(user);

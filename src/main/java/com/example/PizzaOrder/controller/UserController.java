@@ -16,12 +16,31 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    // ==============================
+    // CUSTOMER REGISTRATION
+    // ==============================
+
     @PostMapping("/register")
     public User registerUser(@RequestBody User user) {
 
         return userService.registerUser(user);
 
     }
+
+    // ==============================
+    // ADMIN CREATES DELIVERY GUY
+    // ==============================
+
+    @PostMapping("/delivery")
+    public User createDeliveryGuy(@RequestBody User user) {
+
+        return userService.createDeliveryGuy(user);
+
+    }
+
+    // ==============================
+    // LOGIN
+    // ==============================
 
     @PostMapping("/login")
     public Optional<User> loginUser(
@@ -49,12 +68,20 @@ public class UserController {
 
     }
 
+    // ==============================
+    // GET ALL USERS
+    // ==============================
+
     @GetMapping
     public List<User> getAllUsers() {
 
         return userService.getAllUsers();
 
     }
+
+    // ==============================
+    // GET USER BY ID
+    // ==============================
 
     @GetMapping("/{id}")
     public Optional<User> getUserById(
@@ -64,6 +91,10 @@ public class UserController {
         return userService.getUserById(id);
 
     }
+
+    // ==============================
+    // UPDATE USER
+    // ==============================
 
     @PutMapping("/{id}")
     public User updateUser(
@@ -75,6 +106,10 @@ public class UserController {
 
     }
 
+    // ==============================
+    // ACTIVATE CUSTOMER
+    // ==============================
+
     @PutMapping("/{id}/activate")
     public User activateCustomer(
             @PathVariable Long id
@@ -83,6 +118,10 @@ public class UserController {
         return userService.activateCustomer(id);
 
     }
+
+    // ==============================
+    // DEACTIVATE CUSTOMER
+    // ==============================
 
     @PutMapping("/{id}/deactivate")
     public User deactivateCustomer(

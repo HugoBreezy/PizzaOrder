@@ -8,7 +8,7 @@ public class PizzaOrderApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(PizzaOrderApplication.class, args);
-        System.out.println("Running: " + "http://localhost:8080/");
+        System.out.println("Running Hoooray" );
 	}
 
 

@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import AdminCustomers from "./pages/AdminCustomers";
+
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -11,13 +11,18 @@ import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
 
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminCustomers from "./pages/AdminCustomers";
+import AdminDeliveryGuys from "./pages/AdminDeliveryGuys";
 import AdminPizzas from "./pages/AdminPizzas";
 import AddPizza from "./pages/AddPizza";
 import EditPizza from "./pages/EditPizza";
 import AdminOrders from "./pages/AdminOrders";
 import AdminPayments from "./pages/AdminPayments";
 
+import DeliveryDashboard from "./pages/DeliveryDashboard";
+
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
+import ProtectedDeliveryRoute from "./components/ProtectedDeliveryRoute";
 
 function App() {
 
@@ -26,6 +31,8 @@ function App() {
     <BrowserRouter>
 
       <Routes>
+
+        {/* ================= CUSTOMER ================= */}
 
         <Route path="/" element={<Home />} />
 
@@ -41,6 +48,7 @@ function App() {
 
         <Route path="/orders" element={<Orders />} />
 
+
         {/* ================= ADMIN ================= */}
 
         <Route
@@ -51,14 +59,24 @@ function App() {
             </ProtectedAdminRoute>
           }
         />
+
         <Route
-  path="/admin/customers"
-  element={
-    <ProtectedAdminRoute>
-      <AdminCustomers />
-    </ProtectedAdminRoute>
-  }
-/>
+          path="/admin/customers"
+          element={
+            <ProtectedAdminRoute>
+              <AdminCustomers />
+            </ProtectedAdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/delivery-guys"
+          element={
+            <ProtectedAdminRoute>
+              <AdminDeliveryGuys />
+            </ProtectedAdminRoute>
+          }
+        />
 
         <Route
           path="/admin/pizzas"
@@ -105,7 +123,22 @@ function App() {
           }
         />
 
+
+        {/* ================= DELIVERY ================= */}
+
+        <Route
+          path="/delivery"
+          element={
+            <ProtectedDeliveryRoute>
+              <DeliveryDashboard />
+            </ProtectedDeliveryRoute>
+          }
+        />
+
       </Routes>
+
+
+      {/* ================= TOAST ================= */}
 
       <ToastContainer
         position="top-right"

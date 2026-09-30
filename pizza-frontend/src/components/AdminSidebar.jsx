@@ -18,6 +18,11 @@ function AdminSidebar() {
       icon: "people-fill",
     },
     {
+      name: "Manage Delivery Guys",
+      path: "/admin/delivery-guys",
+      icon: "bicycle",
+    },
+    {
       name: "Manage Pizzas",
       path: "/admin/pizzas",
       icon: "shop",
@@ -110,7 +115,6 @@ function AdminSidebar() {
     </div>
 
   );
-
 }
 
 export default AdminSidebar;

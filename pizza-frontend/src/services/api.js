@@ -6,14 +6,35 @@ const API = axios.create({
 
 // ===================== USERS =====================
 
+// Customer registration
 export const registerUser = (user) =>
     API.post("/users/register", user);
 
+// Login
 export const loginUser = (email, password) =>
     API.post(`/users/login?email=${email}&password=${password}`);
 
+// Get all users
 export const getAllUsers = () =>
     API.get("/users");
+
+// ===================== DELIVERY GUYS =====================
+
+// Admin creates Delivery Guy
+export const createDeliveryGuy = (user) =>
+    API.post("/users/delivery", user);
+
+// Get all Delivery Guys
+export const getDeliveryGuys = async () => {
+    const response = await API.get("/users");
+
+    return {
+        ...response,
+        data: response.data.filter(
+            (user) => user.role === "DELIVERY"
+        ),
+    };
+};
 
 // Activate Customer
 export const activateCustomer = (id) =>

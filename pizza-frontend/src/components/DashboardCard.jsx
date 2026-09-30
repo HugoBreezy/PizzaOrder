@@ -5,79 +5,102 @@ function DashboardCard({
   value,
   icon,
   bgColor = "#8B0000",
-  growth = "+0 This Month",
+  growth = "This Month",
 }) {
   return (
-    <div className="col-xl-3 col-lg-6 col-md-6 mb-4">
+    <div
+      className="card border-0 h-100"
+      style={{
+        borderRadius: "20px",
+        overflow: "hidden",
+        background: "#ffffff",
+        boxShadow: "0 8px 25px rgba(0, 0, 0, 0.07)",
+        transition: "all 0.3s ease",
+        cursor: "pointer",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-6px)";
+        e.currentTarget.style.boxShadow =
+          "0 15px 35px rgba(0, 0, 0, 0.12)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow =
+          "0 8px 25px rgba(0, 0, 0, 0.07)";
+      }}
+    >
+      <div className="card-body p-4">
 
-      <div
-        className="card border-0 h-100"
-        style={{
-          borderRadius: "18px",
-          transition: "all .3s ease",
-          cursor: "pointer",
-          boxShadow: "0 8px 20px rgba(0,0,0,.08)",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "translateY(-8px)";
-          e.currentTarget.style.boxShadow =
-            "0 15px 35px rgba(0,0,0,.18)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "translateY(0)";
-          e.currentTarget.style.boxShadow =
-            "0 8px 20px rgba(0,0,0,.08)";
-        }}
-      >
-        <div className="card-body">
+        <div className="d-flex justify-content-between align-items-start">
 
-          <div className="d-flex justify-content-between">
+          {/* TEXT */}
+          <div style={{ minWidth: 0 }}>
 
-            <div>
-
-              <small className="text-muted">
-                {title}
-              </small>
-
-              <h2
-                className="fw-bold mt-2"
-                style={{
-                  color: "#212529",
-                }}
-              >
-                {value}
-              </h2>
-
-              <small
-                className="fw-semibold"
-                style={{
-                  color: "#28a745",
-                }}
-              >
-                {growth}
-              </small>
-
+            <div
+              className="mb-2"
+              style={{
+                color: "#777",
+                fontSize: "14px",
+                fontWeight: "500",
+              }}
+            >
+              {title}
             </div>
 
             <div
-              className="d-flex justify-content-center align-items-center"
+              className="fw-bold"
               style={{
-                width: "65px",
-                height: "65px",
-                borderRadius: "18px",
-                backgroundColor: bgColor,
-                color: "white",
-                fontSize: "28px",
+                color: "#202020",
+                fontSize: "30px",
+                lineHeight: "1.2",
+                wordBreak: "break-word",
               }}
             >
-              <i className={`bi bi-${icon}`}></i>
+              {value}
             </div>
 
+            <div
+              className="d-flex align-items-center mt-3"
+              style={{
+                color: "#198754",
+                fontSize: "13px",
+                fontWeight: "600",
+              }}
+            >
+              <i className="bi bi-graph-up-arrow me-2"></i>
+              {growth}
+            </div>
+
+          </div>
+
+          {/* ICON */}
+          <div
+            className="d-flex justify-content-center align-items-center flex-shrink-0 ms-3"
+            style={{
+              width: "62px",
+              height: "62px",
+              borderRadius: "17px",
+              background: `linear-gradient(135deg, ${bgColor}, ${bgColor}dd)`,
+              color: "#ffffff",
+              fontSize: "26px",
+              boxShadow: `0 8px 18px ${bgColor}35`,
+            }}
+          >
+            <i className={`bi bi-${icon}`}></i>
           </div>
 
         </div>
 
       </div>
+
+      {/* Bottom accent */}
+      <div
+        style={{
+          height: "4px",
+          width: "100%",
+          background: bgColor,
+        }}
+      ></div>
 
     </div>
   );

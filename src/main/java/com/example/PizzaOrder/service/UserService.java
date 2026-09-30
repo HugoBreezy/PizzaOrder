@@ -7,7 +7,11 @@ import java.util.Optional;
 
 public interface UserService {
 
+    // Customer registration
     User registerUser(User user);
+
+    // Admin creates Delivery Guy
+    User createDeliveryGuy(User user);
 
     Optional<User> loginUser(String email, String password);
 
@@ -25,5 +29,4 @@ public interface UserService {
 
     // Delete Customer
     void deleteUser(Long id);
-
 }

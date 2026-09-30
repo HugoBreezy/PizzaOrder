@@ -35,7 +35,6 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus("PENDING");
 
         return orderRepository.save(order);
-
     }
 
     // ===================== ADMIN =====================
@@ -44,7 +43,6 @@ public class OrderServiceImpl implements OrderService {
     public List<Order> getAllOrders() {
 
         return orderRepository.findAllByOrderByIdDesc();
-
     }
 
     @Override
@@ -53,7 +51,6 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findAllByOrderByIdDesc(
                 PageRequest.of(page, size)
         );
-
     }
 
     // ===================== CUSTOMER =====================
@@ -62,7 +59,6 @@ public class OrderServiceImpl implements OrderService {
     public List<Order> getOrdersByUser(Long userId) {
 
         return orderRepository.findByUserIdOrderByIdDesc(userId);
-
     }
 
     @Override
@@ -72,14 +68,12 @@ public class OrderServiceImpl implements OrderService {
                 userId,
                 PageRequest.of(page, size)
         );
-
     }
 
     @Override
     public Optional<Order> getOrderById(Long id) {
 
         return orderRepository.findById(id);
-
     }
 
     @Override
@@ -90,17 +84,23 @@ public class OrderServiceImpl implements OrderService {
         if (existingOrder.isEmpty()) {
 
             throw new RuntimeException("Order not found");
-
         }
 
         Order order = existingOrder.get();
+
+        // Delivered orders cannot be changed
+        if ("DELIVERED".equalsIgnoreCase(order.getStatus())) {
+
+            throw new RuntimeException(
+                    "Delivered orders cannot be changed."
+            );
+        }
 
         order.setTotalAmount(updatedOrder.getTotalAmount());
         order.setStatus(updatedOrder.getStatus());
         order.setUser(updatedOrder.getUser());
 
         return orderRepository.save(order);
-
     }
 
     @Override
@@ -111,15 +111,23 @@ public class OrderServiceImpl implements OrderService {
         if (existingOrder.isEmpty()) {
 
             throw new RuntimeException("Order not found");
-
         }
 
         Order order = existingOrder.get();
 
+        // ================================
+        // DELIVERED ORDER IS LOCKED
+        // ================================
+        if ("DELIVERED".equalsIgnoreCase(order.getStatus())) {
+
+            throw new RuntimeException(
+                    "Delivered orders cannot be changed."
+            );
+        }
+
         order.setStatus(status);
 
         return orderRepository.save(order);
-
     }
 
     @Override
@@ -132,7 +140,6 @@ public class OrderServiceImpl implements OrderService {
         if (existingOrder.isEmpty()) {
 
             throw new RuntimeException("Order not found");
-
         }
 
         Order order = existingOrder.get();
@@ -143,7 +150,6 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException(
                     "Delivered orders cannot be deleted."
             );
-
         }
 
         // Check payment
@@ -158,11 +164,9 @@ public class OrderServiceImpl implements OrderService {
                 throw new RuntimeException(
                         "Paid orders cannot be deleted."
                 );
-
             }
 
             paymentRepository.delete(payment.get());
-
         }
 
         // Delete all order items
@@ -170,7 +174,5 @@ public class OrderServiceImpl implements OrderService {
 
         // Delete order
         orderRepository.delete(order);
-
     }
-
 }
