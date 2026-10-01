@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+
 import {
   createOrder,
   addOrderItem,
-  createPayment,
 } from "../services/api";
 
 function Checkout() {
@@ -16,6 +16,11 @@ function Checkout() {
   const [total, setTotal] = useState(0);
 
   const navigate = useNavigate();
+
+
+  // ==========================================
+  // LOAD CART AND USER
+  // ==========================================
 
   useEffect(() => {
 
@@ -30,13 +35,19 @@ function Checkout() {
     setUser(loggedUser);
 
     const grandTotal = cartItems.reduce(
-      (sum, item) => sum + item.price * item.quantity,
+      (sum, item) =>
+        sum + item.price * item.quantity,
       0
     );
 
     setTotal(grandTotal);
 
   }, []);
+
+
+  // ==========================================
+  // PLACE ORDER
+  // ==========================================
 
   const handlePlaceOrder = async () => {
 
@@ -50,6 +61,7 @@ function Checkout() {
 
     }
 
+
     if (cart.length === 0) {
 
       toast.warning("Your cart is empty.");
@@ -58,36 +70,51 @@ function Checkout() {
 
     }
 
+
     try {
 
-      // Create Order
-      const orderResponse = await createOrder({
 
-        totalAmount: total,
+      // ======================================
+      // CREATE ORDER
+      // ======================================
 
-        user: {
-          id: user.id,
-        },
+      const orderResponse =
+        await createOrder({
 
-      });
+          totalAmount: total,
+
+          user: {
+            id: user.id,
+          },
+
+        });
+
 
       const order = orderResponse.data;
 
-      // ================= CREATE PAYMENT =================
 
-      await createPayment({
+      // ======================================
+      // PAYMENT
+      // ======================================
+      //
+      // Payment is now created automatically
+      // inside OrderServiceImpl.createOrder()
+      //
+      // Status:
+      // PENDING
+      //
+      // Method:
+      // CASH_ON_DELIVERY
+      //
+      // Amount:
+      // Order total
+      //
+      // ======================================
 
-        orderId: order.id,
 
-        paymentMethod: "Cash On Delivery",
-
-        amount: total,
-
-        paymentStatus: "PENDING",
-
-      });
-
-      // ================= SAVE ORDER ITEMS =================
+      // ======================================
+      // SAVE ORDER ITEMS
+      // ======================================
 
       for (const item of cart) {
 
@@ -105,17 +132,31 @@ function Checkout() {
 
           price: item.price,
 
-          subtotal: item.price * item.quantity,
+          subtotal:
+            item.price * item.quantity,
 
         });
 
       }
 
+
+      // ======================================
+      // CLEAR CART
+      // ======================================
+
       localStorage.removeItem("cart");
 
       setCart([]);
 
-      toast.success("Order placed successfully!");
+
+      // ======================================
+      // SUCCESS
+      // ======================================
+
+      toast.success(
+        "Order placed successfully!"
+      );
+
 
       setTimeout(() => {
 
@@ -123,21 +164,27 @@ function Checkout() {
 
       }, 1200);
 
+
     } catch (error) {
 
       console.error(error);
 
-      toast.error("Failed to place order.");
+      toast.error(
+        error.response?.data ||
+        "Failed to place order."
+      );
 
     }
 
   };
+
 
   return (
 
     <>
 
       <Navbar />
+
 
       <section
         className="py-5"
@@ -149,18 +196,27 @@ function Checkout() {
 
         <div className="container">
 
+
+          {/* =====================================
+              PAGE TITLE
+          ===================================== */}
+
           <h2
             className="fw-bold mb-4"
             style={{
               color: "#8B0000",
             }}
           >
-
             Checkout
-
           </h2>
 
+
           <div className="row">
+
+
+            {/* =====================================
+                CUSTOMER INFORMATION
+            ===================================== */}
 
             <div className="col-lg-8">
 
@@ -168,27 +224,56 @@ function Checkout() {
 
                 <div className="card-body">
 
-                  <h4>Customer Information</h4>
+                  <h4>
+                    Customer Information
+                  </h4>
 
                   <hr />
 
-                  <p><strong>Name:</strong> {user?.fullName}</p>
 
-                  <p><strong>Email:</strong> {user?.email}</p>
+                  <p>
+                    <strong>Name:</strong>{" "}
+                    {user?.fullName}
+                  </p>
 
-                  <p><strong>Phone:</strong> {user?.phone}</p>
 
-                  <p><strong>Address:</strong> {user?.address}</p>
+                  <p>
+                    <strong>Email:</strong>{" "}
+                    {user?.email}
+                  </p>
+
+
+                  <p>
+                    <strong>Phone:</strong>{" "}
+                    {user?.phone}
+                  </p>
+
+
+                  <p>
+                    <strong>Address:</strong>{" "}
+                    {user?.address}
+                  </p>
+
 
                   <hr />
 
-                  <h4>Order Summary</h4>
+
+                  {/* =====================================
+                      ORDER SUMMARY
+                  ===================================== */}
+
+                  <h4>
+                    Order Summary
+                  </h4>
 
                   <hr />
+
 
                   {cart.length === 0 ? (
 
-                    <p>Your cart is empty.</p>
+                    <p>
+                      Your cart is empty.
+                    </p>
 
                   ) : (
 
@@ -201,21 +286,28 @@ function Checkout() {
 
                         <div>
 
-                          <strong>{item.pizzaName}</strong>
+                          <strong>
+                            {item.pizzaName}
+                          </strong>
 
                           <br />
 
                           <small>
-
-                            {item.size} × {item.quantity}
-
+                            {item.size} ×{" "}
+                            {item.quantity}
                           </small>
 
                         </div>
 
+
                         <strong>
 
-                          TZS {(item.price * item.quantity).toLocaleString()}
+                          TZS{" "}
+
+                          {(
+                            item.price *
+                            item.quantity
+                          ).toLocaleString()}
 
                         </strong>
 
@@ -231,37 +323,55 @@ function Checkout() {
 
             </div>
 
+
+            {/* =====================================
+                PAYMENT
+            ===================================== */}
+
             <div className="col-lg-4">
 
               <div className="card shadow border-0">
 
                 <div className="card-body">
 
-                  <h4>Payment</h4>
+                  <h4>
+                    Payment
+                  </h4>
 
                   <hr />
 
+
                   <p>
 
-                    <strong>Method:</strong>
+                    <strong>
+                      Method:
+                    </strong>{" "}
 
                     Cash On Delivery
 
                   </p>
 
+
                   <hr />
 
-                  <div className="d-flex justify-content-between">
 
-                    <strong>Total</strong>
+                  <div
+                    className="d-flex justify-content-between"
+                  >
+
+                    <strong>
+                      Total
+                    </strong>
 
                     <strong>
 
-                      TZS {total.toLocaleString()}
+                      TZS{" "}
+                      {total.toLocaleString()}
 
                     </strong>
 
                   </div>
+
 
                   <button
                     onClick={handlePlaceOrder}
@@ -287,6 +397,7 @@ function Checkout() {
         </div>
 
       </section>
+
 
       <Footer />
 

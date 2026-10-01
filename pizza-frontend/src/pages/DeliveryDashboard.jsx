@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+
 import {
     getAllOrders,
     getPaymentByOrder,
@@ -8,6 +10,8 @@ import {
 } from "../services/api";
 
 function DeliveryDashboard() {
+
+    const navigate = useNavigate();
 
     const [orders, setOrders] = useState([]);
     const [payments, setPayments] = useState({});
@@ -21,7 +25,9 @@ function DeliveryDashboard() {
     }, []);
 
     const loadOrders = async () => {
+
         try {
+
             setLoading(true);
 
             const response = await getAllOrders();
@@ -35,27 +41,44 @@ function DeliveryDashboard() {
             const paymentData = {};
 
             for (const order of deliveryOrders) {
+
                 try {
+
                     const paymentResponse =
                         await getPaymentByOrder(order.id);
 
                     paymentData[order.id] = paymentResponse.data;
+
                 } catch (error) {
+
                     console.log(
                         `Payment not found for order ${order.id}`
                     );
+
                 }
+
             }
 
             setPayments(paymentData);
 
         } catch (error) {
+
             console.log(error);
+
             toast.error("Failed to load deliveries.");
+
         } finally {
+
             setLoading(false);
+
         }
+
     };
+
+
+    // ==========================================
+    // CONFIRM CASH PAYMENT
+    // ==========================================
 
     const handleConfirmCash = async (orderId) => {
 
@@ -65,7 +88,9 @@ function DeliveryDashboard() {
 
             await confirmPayment(orderId);
 
-            toast.success("Cash payment confirmed successfully!");
+            toast.success(
+                "Cash payment confirmed successfully!"
+            );
 
             await loadOrders();
 
@@ -80,9 +105,17 @@ function DeliveryDashboard() {
             toast.error(message);
 
         } finally {
+
             setProcessing(null);
+
         }
+
     };
+
+
+    // ==========================================
+    // MARK ORDER AS DELIVERED
+    // ==========================================
 
     const handleMarkDelivered = async (orderId) => {
 
@@ -92,10 +125,15 @@ function DeliveryDashboard() {
 
             const payment = payments[orderId];
 
-            if (!payment || payment.paymentStatus !== "PAID") {
+            if (
+                !payment ||
+                payment.paymentStatus !== "PAID"
+            ) {
+
                 toast.error(
                     "Please confirm cash payment before marking the order as delivered."
                 );
+
                 return;
             }
 
@@ -104,7 +142,9 @@ function DeliveryDashboard() {
                 "DELIVERED"
             );
 
-            toast.success("Order marked as delivered!");
+            toast.success(
+                "Order marked as delivered!"
+            );
 
             await loadOrders();
 
@@ -119,9 +159,32 @@ function DeliveryDashboard() {
             toast.error(message);
 
         } finally {
+
             setProcessing(null);
+
         }
+
     };
+
+
+    // ==========================================
+    // LOGOUT
+    // ==========================================
+
+    const handleLogout = () => {
+
+        localStorage.removeItem("user");
+
+        navigate("/login", {
+            replace: true,
+        });
+
+    };
+
+
+    // ==========================================
+    // STATISTICS
+    // ==========================================
 
     const totalDeliveries = orders.length;
 
@@ -135,6 +198,7 @@ function DeliveryDashboard() {
             payments[order.id]?.paymentStatus !== "PAID"
     ).length;
 
+
     return (
 
         <div
@@ -145,7 +209,10 @@ function DeliveryDashboard() {
             }}
         >
 
-            {/* ================= SIDEBAR ================= */}
+
+            {/* ==========================================
+                SIDEBAR
+            ========================================== */}
 
             <div
                 style={{
@@ -156,13 +223,15 @@ function DeliveryDashboard() {
                 }}
             >
 
-                {/* Logo / Brand */}
+
+                {/* LOGO / BRAND */}
 
                 <div
                     className="text-center"
                     style={{
                         padding: "28px 15px",
-                        borderBottom: "1px solid rgba(255,255,255,0.2)"
+                        borderBottom:
+                            "1px solid rgba(255,255,255,0.2)"
                     }}
                 >
 
@@ -190,7 +259,7 @@ function DeliveryDashboard() {
                 </div>
 
 
-                {/* Navigation */}
+                {/* NAVIGATION */}
 
                 <div className="p-3">
 
@@ -202,11 +271,17 @@ function DeliveryDashboard() {
                             fontWeight: "600"
                         }}
                     >
-                        <span style={{ fontSize: "20px" }}>
+
+                        <span
+                            style={{
+                                fontSize: "20px"
+                            }}
+                        >
                             📊
                         </span>
 
                         Dashboard
+
                     </div>
 
 
@@ -217,11 +292,17 @@ function DeliveryDashboard() {
                             fontWeight: "600"
                         }}
                     >
-                        <span style={{ fontSize: "20px" }}>
+
+                        <span
+                            style={{
+                                fontSize: "20px"
+                            }}
+                        >
                             🚴
                         </span>
 
                         My Deliveries
+
                     </div>
 
                 </div>
@@ -229,43 +310,63 @@ function DeliveryDashboard() {
             </div>
 
 
-            {/* ================= MAIN CONTENT ================= */}
+            {/* ==========================================
+                MAIN CONTENT
+            ========================================== */}
 
             <div className="flex-grow-1">
 
-                {/* ================= TOPBAR ================= */}
+
+                {/* ==========================================
+                    TOPBAR
+                ========================================== */}
 
                 <div
                     className="d-flex justify-content-between align-items-center"
                     style={{
-                        height: "105px",
+                        minHeight: "105px",
                         backgroundColor: "white",
                         borderBottom: "2px solid #8B0000",
                         padding: "0 30px"
                     }}
                 >
 
+                    {/* LEFT */}
+
                     <div>
 
                         <h2
                             className="fw-bold mb-1"
-                            style={{ color: "#8B0000" }}
+                            style={{
+                                color: "#8B0000"
+                            }}
                         >
                             Delivery Dashboard
                         </h2>
 
                         <span className="text-muted">
+
                             Welcome back,{" "}
+
                             <strong>
-                                {user?.fullName || "Delivery Guy"}
+                                {user?.fullName ||
+                                    "Delivery Guy"}
                             </strong>{" "}
+
                             🚴
+
                         </span>
 
                     </div>
 
 
-                    <div className="d-flex align-items-center gap-3">
+                    {/* RIGHT */}
+
+                    <div
+                        className="d-flex align-items-center gap-3"
+                    >
+
+                        {/* PROFILE INITIAL */}
 
                         <div
                             className="rounded-circle d-flex align-items-center justify-content-center"
@@ -278,36 +379,69 @@ function DeliveryDashboard() {
                                 fontSize: "18px"
                             }}
                         >
+
                             {user?.fullName
                                 ? user.fullName
                                       .charAt(0)
                                       .toUpperCase()
                                 : "D"}
+
                         </div>
+
+
+                        {/* USER INFO */}
 
                         <div>
 
                             <strong>
-                                {user?.fullName || "Delivery Guy"}
+                                {user?.fullName ||
+                                    "Delivery Guy"}
                             </strong>
 
                             <div
                                 className="text-muted"
-                                style={{ fontSize: "13px" }}
+                                style={{
+                                    fontSize: "13px"
+                                }}
                             >
                                 DELIVERY
                             </div>
 
                         </div>
 
+
+                        {/* LOGOUT */}
+
+                        <button
+                            type="button"
+                            className="btn btn-dark d-flex align-items-center gap-2"
+                            onClick={handleLogout}
+                            style={{
+                                borderRadius: "10px",
+                                padding: "9px 16px",
+                                fontWeight: "600"
+                            }}
+                        >
+
+                            <span>
+                                ↪
+                            </span>
+
+                            Logout
+
+                        </button>
+
                     </div>
 
                 </div>
 
 
-                {/* ================= PAGE BODY ================= */}
+                {/* ==========================================
+                    PAGE BODY
+                ========================================== */}
 
                 <div className="container-fluid p-4">
+
 
                     {/* TITLE */}
 
@@ -315,7 +449,9 @@ function DeliveryDashboard() {
 
                         <h2
                             className="fw-bold"
-                            style={{ color: "#8B0000" }}
+                            style={{
+                                color: "#8B0000"
+                            }}
                         >
                             My Deliveries
                         </h2>
@@ -327,11 +463,14 @@ function DeliveryDashboard() {
                     </div>
 
 
-                    {/* ================= STATISTICS ================= */}
+                    {/* ==========================================
+                        STATISTICS
+                    ========================================== */}
 
                     <div className="row g-4 mb-4">
 
-                        {/* Total */}
+
+                        {/* TOTAL */}
 
                         <div className="col-md-4">
 
@@ -344,7 +483,9 @@ function DeliveryDashboard() {
 
                                 <div className="card-body p-4">
 
-                                    <div className="d-flex justify-content-between">
+                                    <div
+                                        className="d-flex justify-content-between"
+                                    >
 
                                         <div>
 
@@ -357,6 +498,7 @@ function DeliveryDashboard() {
                                             </h2>
 
                                         </div>
+
 
                                         <div
                                             className="d-flex align-items-center justify-content-center rounded-circle"
@@ -379,7 +521,7 @@ function DeliveryDashboard() {
                         </div>
 
 
-                        {/* Paid */}
+                        {/* PAID */}
 
                         <div className="col-md-4">
 
@@ -392,7 +534,9 @@ function DeliveryDashboard() {
 
                                 <div className="card-body p-4">
 
-                                    <div className="d-flex justify-content-between">
+                                    <div
+                                        className="d-flex justify-content-between"
+                                    >
 
                                         <div>
 
@@ -405,6 +549,7 @@ function DeliveryDashboard() {
                                             </h2>
 
                                         </div>
+
 
                                         <div
                                             className="d-flex align-items-center justify-content-center rounded-circle"
@@ -427,7 +572,7 @@ function DeliveryDashboard() {
                         </div>
 
 
-                        {/* Pending */}
+                        {/* PENDING */}
 
                         <div className="col-md-4">
 
@@ -440,7 +585,9 @@ function DeliveryDashboard() {
 
                                 <div className="card-body p-4">
 
-                                    <div className="d-flex justify-content-between">
+                                    <div
+                                        className="d-flex justify-content-between"
+                                    >
 
                                         <div>
 
@@ -453,6 +600,7 @@ function DeliveryDashboard() {
                                             </h2>
 
                                         </div>
+
 
                                         <div
                                             className="d-flex align-items-center justify-content-center rounded-circle"
@@ -477,7 +625,9 @@ function DeliveryDashboard() {
                     </div>
 
 
-                    {/* ================= ORDERS ================= */}
+                    {/* ==========================================
+                        ORDERS
+                    ========================================== */}
 
                     <div
                         className="card border-0 shadow"
@@ -490,7 +640,8 @@ function DeliveryDashboard() {
                             className="card-header text-white d-flex justify-content-between align-items-center"
                             style={{
                                 backgroundColor: "#8B0000",
-                                borderRadius: "15px 15px 0 0"
+                                borderRadius:
+                                    "15px 15px 0 0"
                             }}
                         >
 
@@ -510,7 +661,9 @@ function DeliveryDashboard() {
 
                         <div className="table-responsive">
 
-                            <table className="table table-hover align-middle mb-0">
+                            <table
+                                className="table table-hover align-middle mb-0"
+                            >
 
                                 <thead>
 
@@ -571,7 +724,9 @@ function DeliveryDashboard() {
                                                     }}
                                                 ></div>
 
-                                                <div className="mt-2 text-muted">
+                                                <div
+                                                    className="mt-2 text-muted"
+                                                >
                                                     Loading deliveries...
                                                 </div>
 
@@ -625,7 +780,9 @@ function DeliveryDashboard() {
 
                                             return (
 
-                                                <tr key={order.id}>
+                                                <tr
+                                                    key={order.id}
+                                                >
 
                                                     <td className="px-4">
 
@@ -663,10 +820,13 @@ function DeliveryDashboard() {
                                                     <td>
 
                                                         <strong>
+
                                                             TZS{" "}
+
                                                             {Number(
                                                                 order.totalAmount
                                                             ).toLocaleString()}
+
                                                         </strong>
 
                                                     </td>
@@ -702,7 +862,9 @@ function DeliveryDashboard() {
 
                                                     <td>
 
-                                                        <div className="d-flex gap-2">
+                                                        <div
+                                                            className="d-flex gap-2"
+                                                        >
 
                                                             {!isPaid && (
 
@@ -776,6 +938,7 @@ function DeliveryDashboard() {
         </div>
 
     );
+
 }
 
 export default DeliveryDashboard;

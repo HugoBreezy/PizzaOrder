@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -24,6 +24,88 @@ import DeliveryDashboard from "./pages/DeliveryDashboard";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import ProtectedDeliveryRoute from "./components/ProtectedDeliveryRoute";
 
+
+// =====================================================
+// CUSTOMER PROTECTED ROUTE
+// =====================================================
+
+function ProtectedCustomerRoute({ children }) {
+
+  const user = JSON.parse(
+    localStorage.getItem("user")
+  );
+
+  // No logged-in user
+  if (!user) {
+
+    return (
+      <Navigate
+        to="/login"
+        replace
+      />
+    );
+
+  }
+
+
+  // ADMIN should go to admin dashboard
+  if (user.role === "ADMIN") {
+
+    return (
+      <Navigate
+        to="/admin"
+        replace
+      />
+    );
+
+  }
+
+
+  // DELIVERY should go to delivery dashboard
+  if (user.role === "DELIVERY") {
+
+    return (
+      <Navigate
+        to="/delivery"
+        replace
+      />
+    );
+
+  }
+
+
+  // Only CUSTOMER can continue
+  if (user.role !== "CUSTOMER") {
+
+    return (
+      <Navigate
+        to="/login"
+        replace
+      />
+    );
+
+  }
+
+
+  // Customer account deactivated
+  if (user.status === "INACTIVE") {
+
+    localStorage.removeItem("user");
+
+    return (
+      <Navigate
+        to="/login"
+        replace
+      />
+    );
+
+  }
+
+
+  return children;
+}
+
+
 function App() {
 
   return (
@@ -32,24 +114,72 @@ function App() {
 
       <Routes>
 
-        {/* ================= CUSTOMER ================= */}
 
-        <Route path="/" element={<Home />} />
+        {/* =================================================
+            PUBLIC
+        ================================================= */}
 
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/"
+          element={<Home />}
+        />
 
-        <Route path="/register" element={<Register />} />
+        <Route
+          path="/login"
+          element={<Login />}
+        />
 
-        <Route path="/menu" element={<Menu />} />
-
-        <Route path="/cart" element={<Cart />} />
-
-        <Route path="/checkout" element={<Checkout />} />
-
-        <Route path="/orders" element={<Orders />} />
+        <Route
+          path="/register"
+          element={<Register />}
+        />
 
 
-        {/* ================= ADMIN ================= */}
+        {/* =================================================
+            CUSTOMER
+            ONLY CUSTOMER CAN ACCESS THESE PAGES
+        ================================================= */}
+
+        <Route
+          path="/menu"
+          element={
+            <ProtectedCustomerRoute>
+              <Menu />
+            </ProtectedCustomerRoute>
+          }
+        />
+
+        <Route
+          path="/cart"
+          element={
+            <ProtectedCustomerRoute>
+              <Cart />
+            </ProtectedCustomerRoute>
+          }
+        />
+
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedCustomerRoute>
+              <Checkout />
+            </ProtectedCustomerRoute>
+          }
+        />
+
+        <Route
+          path="/orders"
+          element={
+            <ProtectedCustomerRoute>
+              <Orders />
+            </ProtectedCustomerRoute>
+          }
+        />
+
+
+        {/* =================================================
+            ADMIN
+        ================================================= */}
 
         <Route
           path="/admin"
@@ -124,7 +254,9 @@ function App() {
         />
 
 
-        {/* ================= DELIVERY ================= */}
+        {/* =================================================
+            DELIVERY
+        ================================================= */}
 
         <Route
           path="/delivery"
@@ -135,10 +267,27 @@ function App() {
           }
         />
 
+
+        {/* =================================================
+            UNKNOWN URL
+        ================================================= */}
+
+        <Route
+          path="*"
+          element={
+            <Navigate
+              to="/"
+              replace
+            />
+          }
+        />
+
       </Routes>
 
 
-      {/* ================= TOAST ================= */}
+      {/* =================================================
+          TOAST
+      ================================================= */}
 
       <ToastContainer
         position="top-right"
