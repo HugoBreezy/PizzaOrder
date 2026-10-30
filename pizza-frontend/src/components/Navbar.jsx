@@ -51,6 +51,7 @@ function Navbar() {
   const handleLogout = () => {
 
     localStorage.removeItem("user");
+    localStorage.removeItem("authToken");
 
     navigate("/login");
 
@@ -506,4 +507,3 @@ const clearCart = () => {
 }
 
 export default Navbar;
-          

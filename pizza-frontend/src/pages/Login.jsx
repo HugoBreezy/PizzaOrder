@@ -19,11 +19,12 @@ function Login() {
     try {
       setLoading(true);
       const response = await loginUser(login.email, login.password);
-      const user = response.data;
+      const user = response.data?.user;
       if (!user) {
         toast.error("Invalid Email or Password");
         return;
       }
+      localStorage.setItem("authToken", response.data.token);
       localStorage.setItem("user", JSON.stringify(user));
       toast.success("Login Successful!");
       setTimeout(() => {

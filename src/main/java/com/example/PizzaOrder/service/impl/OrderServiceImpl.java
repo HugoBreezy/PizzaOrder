@@ -5,11 +5,14 @@ import com.example.PizzaOrder.entity.Payment;
 import com.example.PizzaOrder.repository.OrderItemRepository;
 import com.example.PizzaOrder.repository.OrderRepository;
 import com.example.PizzaOrder.repository.PaymentRepository;
+import com.example.PizzaOrder.repository.UserRepository;
+import com.example.PizzaOrder.security.AppUserPrincipal;
 import com.example.PizzaOrder.service.OrderService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -28,6 +31,9 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderItemRepository orderItemRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
 
     // =====================================================
     // CREATE ORDER
@@ -36,6 +42,13 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public Order createOrder(Order order) {
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof AppUserPrincipal authenticatedUser)) {
+            throw new RuntimeException("Authentication required");
+        }
+        order.setUser(userRepository.findById(authenticatedUser.id())
+                .orElseThrow(() -> new RuntimeException("User not found")));
 
         // Set order date
         order.setOrderDate(LocalDateTime.now());

@@ -7,6 +7,7 @@ import com.example.PizzaOrder.repository.OrderRepository;
 import com.example.PizzaOrder.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +44,7 @@ public class PaymentController {
 
     // Confirm Payments Page
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public List<Payment> getAllPayments() {
 
         return paymentService.getAllPayments();
@@ -51,6 +53,7 @@ public class PaymentController {
 
     // Dashboard Revenue
     @GetMapping("/paid")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<Payment> getPaidPayments() {
 
         return paymentService.getPaidPayments();
@@ -58,6 +61,7 @@ public class PaymentController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public Optional<Payment> getPaymentById(
             @PathVariable Long id
     ) {
@@ -76,6 +80,7 @@ public class PaymentController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public Payment updatePayment(
             @PathVariable Long id,
             @RequestBody Payment payment
@@ -95,6 +100,7 @@ public class PaymentController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String deletePayment(
             @PathVariable Long id
     ) {

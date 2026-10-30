@@ -63,7 +63,6 @@ public class OrderItemServiceImpl implements OrderItemService {
             orderItem.setPrice(pizza.getPrice());
             orderItem.setSubtotal(pizza.getPrice() * updatedOrderItem.getQuantity());
 
-            orderItem.setOrder(updatedOrderItem.getOrder());
             orderItem.setPizza(pizza);
 
             return orderItemRepository.save(orderItem);

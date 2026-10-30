@@ -1,12 +1,18 @@
 package com.example.PizzaOrder.controller;
 
 import com.example.PizzaOrder.entity.User;
+import com.example.PizzaOrder.dto.LoginRequest;
+import com.example.PizzaOrder.dto.LoginResponse;
+import com.example.PizzaOrder.dto.UserResponse;
+import com.example.PizzaOrder.security.AppUserPrincipal;
+import com.example.PizzaOrder.security.AuthTokenService;
 import com.example.PizzaOrder.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/users")
@@ -16,14 +22,16 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private AuthTokenService authTokenService;
+
     // ==============================
     // CUSTOMER REGISTRATION
     // ==============================
 
     @PostMapping("/register")
-    public User registerUser(@RequestBody User user) {
-
-        return userService.registerUser(user);
+    public UserResponse registerUser(@RequestBody User user) {
+        return UserResponse.from(userService.registerUser(user));
 
     }
 
@@ -32,9 +40,8 @@ public class UserController {
     // ==============================
 
     @PostMapping("/delivery")
-    public User createDeliveryGuy(@RequestBody User user) {
-
-        return userService.createDeliveryGuy(user);
+    public UserResponse createDeliveryGuy(@RequestBody User user) {
+        return UserResponse.from(userService.createDeliveryGuy(user));
 
     }
 
@@ -43,14 +50,17 @@ public class UserController {
     // ==============================
 
     @PostMapping("/login")
-    public Optional<User> loginUser(
-            @RequestParam String email,
-            @RequestParam String password
-    ) {
+    public LoginResponse loginUser(@RequestBody LoginRequest request) {
+        if (request.email() == null || request.password() == null) {
+            throw new RuntimeException("Email and password are required");
+        }
 
         try {
 
-            return userService.loginUser(email, password);
+            User user = userService.loginUser(request.email(), request.password())
+                    .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+            String token = authTokenService.issue(new AppUserPrincipal(user.getId(), user.getEmail(), user.getRole()));
+            return new LoginResponse(token, UserResponse.from(user));
 
         } catch (RuntimeException e) {
 
@@ -73,9 +83,8 @@ public class UserController {
     // ==============================
 
     @GetMapping
-    public List<User> getAllUsers() {
-
-        return userService.getAllUsers();
+    public List<UserResponse> getAllUsers() {
+        return userService.getAllUsers().stream().map(UserResponse::from).collect(Collectors.toList());
 
     }
 
@@ -84,11 +93,11 @@ public class UserController {
     // ==============================
 
     @GetMapping("/{id}")
-    public Optional<User> getUserById(
+    public Optional<UserResponse> getUserById(
             @PathVariable Long id
     ) {
 
-        return userService.getUserById(id);
+        return userService.getUserById(id).map(UserResponse::from);
 
     }
 
@@ -97,12 +106,12 @@ public class UserController {
     // ==============================
 
     @PutMapping("/{id}")
-    public User updateUser(
+    public UserResponse updateUser(
             @PathVariable Long id,
             @RequestBody User user
     ) {
 
-        return userService.updateUser(id, user);
+        return UserResponse.from(userService.updateUser(id, user));
 
     }
 
@@ -111,11 +120,11 @@ public class UserController {
     // ==============================
 
     @PutMapping("/{id}/activate")
-    public User activateCustomer(
+    public UserResponse activateCustomer(
             @PathVariable Long id
     ) {
 
-        return userService.activateCustomer(id);
+        return UserResponse.from(userService.activateCustomer(id));
 
     }
 
@@ -124,11 +133,11 @@ public class UserController {
     // ==============================
 
     @PutMapping("/{id}/deactivate")
-    public User deactivateCustomer(
+    public UserResponse deactivateCustomer(
             @PathVariable Long id
     ) {
 
-        return userService.deactivateCustomer(id);
+        return UserResponse.from(userService.deactivateCustomer(id));
 
     }
 

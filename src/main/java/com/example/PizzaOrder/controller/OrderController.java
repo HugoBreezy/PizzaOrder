@@ -4,6 +4,7 @@ import com.example.PizzaOrder.entity.Order;
 import com.example.PizzaOrder.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -49,6 +50,7 @@ public class OrderController {
 
 
     @GetMapping("/user/{userId}")
+    @PreAuthorize("@requestAuthorization.isSelfOrAdmin(#userId)")
     public List<Order> getOrdersByUser(
             @PathVariable Long userId
     ) {
@@ -59,6 +61,7 @@ public class OrderController {
 
 
     @GetMapping("/user/{userId}/page")
+    @PreAuthorize("@requestAuthorization.isSelfOrAdmin(#userId)")
     public Page<Order> getOrdersByUserPage(
 
             @PathVariable Long userId,
